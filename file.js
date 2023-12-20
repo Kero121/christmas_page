@@ -1,133 +1,76 @@
 var words = [
-    {number:1,direction:'across',row:1,column:3,clue:'The fusion of Pro and Art, created by creators',answer:'studiobook'},
-    {number:2,direction:'across',row:2,column:4,clue:'The colorful, bold and youthful series.',answer:'vivobook'},
+    {number:1,direction:'across',row:1,column:3,clue:'Best laptop for creators, Hint: it starts with the letter S',answer:'studiobook'},
+    {number:2,direction:'across',row:2,column:4,clue:'The colorful, bold and youthful series, Hint: it starts with the letter V',answer:'vivobook'},
     {number:3,direction:'across',row:3,column:3,clue:'Premium,thin and light',answer:'zenbook'},
-    {number:4,direction:'across',row:4,column:3,clue:'Ultimate performance for creators',answer:'proart'},
-    {number:5,direction:'across',row:5,column:5,clue:'The best take-anywhere laptops',answer:'expertbook'}
-  ];
-  
-  // Set global variables
-  var gridSize = [14,5];     // number of squares wide, number of squares tall
-  var direction = 'across';   // set initial direction to 'across'
-  var markCorrect = true;     // indicates ability for answers to be marked correct. will be set to false if "show answers" is clicked
-  var successShown = false;   // indicates whether the success modal has been shown
-  var $clueTooltip = $('<div class="clue-tooltip invisible"><div class="clue-tooltip-arrow"></div><div class="clue-tooltip-text"></div></div>').appendTo('.crossword');
-  
+    {number:4,direction:'across',row:4,column:3,clue:'The fusion of Pro and Art, created by creators',answer:'proart'},
+    {number:5,direction:'across',row:5,column:5,clue:'The ultimate laptop for Experts',answer:'expertbook'}
+];
 
-  
-  // set up the base grid
-  var $crosswordPuzzle = $('<div class="mt-4 crossword-puzzle col-md-8 col-lg-10 d-flex justify-content-center align-items-center"></div>');
-  var $table = $('<table class="crossword-grid"></table>');
-  for ( i=0; i<gridSize[1]; i++) {
-      var $row = $('<tr class="grid-row"></tr>');
-      for (j=0;j<gridSize[0];j++) {
-          $square = $('<td class="grid-square"></td>');
-          $square.appendTo($row);
-      }
-      $row.appendTo($table);
-      $table.appendTo($crosswordPuzzle);
-      $crosswordPuzzle.appendTo('.crossword');
-  }
-  
-  // Add the fields to the grid
-  for (i=0;i<words.length;i++) {
-      var row = words[i].row;
-      var column = words[i].column;
-      for (j=0;j<words[i].answer.length;j++) {
-          var $square = $('.grid-row').eq(row-1).find('.grid-square').eq(column-1);
-          var title = words[i].clue+', letter '+(j+1)+' of '+words[i].answer.length;
-          var id = (words[i].direction == 'across' ? 'a' : 'd') + '-' + words[i].number + '-' + (j+1);
-          if (j==0 && $square.find('.word-label').length == 0) {
-              $('<span class="word-label">'+words[i].number+'</span>').appendTo($square);
-          }
-          if ($square.find('input').length == 0) {
-              var $input = $('<input type="text" class="letter" title="'+title+'" id="'+id+'" maxlength="1" />');
-                  if (words[i].direction == 'across') {
-                      $input.attr('data-across',words[i].number);
-                      $input.attr('data-across-clue',words[i].clue);
-                  } else {
-                      $input.attr('data-down',words[i].number);
-                      $input.attr('data-down-clue',words[i].clue);
-                  }
-                  $input.data('letter',words[i].answer[j]);
-                  $input.appendTo($square);
-              $square.addClass('active');
-          } else {
-              var $input = $square.find('input');
-                  $input.attr('title',$input.attr('title')+'; '+title);
-                  $input.attr('id',$input.attr('id')+'+'+id);
-                  if (words[i].direction == 'across') {
-                      $input.attr('data-across',words[i].number);
-                      $input.attr('data-across-clue',words[i].clue);
-                  } else {
-                      $input.attr('data-down',words[i].number);
-                      $input.attr('data-down-clue',words[i].clue);
-                  }
-          }
-          if (words[i].direction == 'down') {
-              row++;
-          } else {
-              column++;
-          }
-      }
-  }
-  
-  
-  
-  // Add the success modal
-  var $modal = $('<div class="modal fade" id="success-modal" tabindex="-1" role="dialog"><div class="modal-dialog" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title">Congratulations!</h4></div><div class="modal-body"><p>You have finished the puzzle.</p></div></div></div></div>');
-  $modal.appendTo('body');
-  
-  // When a square is focused, highlight the other squares in that word and the clue, and show the tooltip
-  $('input.letter').on('focus',function(){
-      var $current = $(this);
-      $current.select();
-      $current[0].setSelectionRange(0, 10);
-      getDirection($current);
-      $('[data-'+direction+'='+$current.data(direction)+']').parent('.grid-square').addClass('current-word');
-      $('.crossword-clues li').removeClass('active');
-      $('.crossword-clues li[data-direction='+direction+'][data-clue='+$(this).data(direction)+']').addClass('active');
-      $clueTooltip.css({'left':tooltipPosition($current).left+'px','top':tooltipPosition($current).top-10+'px'}).removeClass('invisible').find('.clue-tooltip-arrow').css('left',tooltipPosition($current).offset+'px');
-  })
-  
-  // When a square is blurred, remove highlight from squares and clue
-  $('input.letter').on('blur',function(){
-      $('.grid-square').removeClass('current-word');
-      $('.crossword-clues li').removeClass('active');
-      $clueTooltip.addClass('invisible');
-  })
-  
-  // handle directional and letter keys in letter inputs
-  $('input.letter').on('keyup',function(e){
-      var $current = $(this);
-      if (e.which == 38) {      // up arrow moves to square above if it exists
-          direction = 'down';
-          if (getPrevLetter($current)) {
-              getPrevLetter($current).focus();
-          }
-      } else if (e.which == 40) {      // down arrow moves to square below if it exists
-          direction = 'down';
-          if (getNextLetter($current)) {
-              getNextLetter($current).focus();
-          }
-      } else if (e.which == 37) {      // left arrow moves to square to the left if it exists
-          direction = 'across';
-          if (getPrevLetter($current)) {
-              getPrevLetter($current).focus();
-          }
-      } else if (e.which == 39) {      // right arrow moves to square to the right if it exists
-          direction = 'across';
-          if (getNextLetter($current)) {
-              getNextLetter($current).focus();
-          }
-      } else {
-          e.preventDefault();
-      }
-      if (markCorrect) {
-          checkWord($current);
-      };
-  })
-  
+var gridSize = [14,5];
+var direction = 'across';
+var markCorrect = true;
+var successShown = false;
+var $clueTooltip = $('<div class="clue-tooltip invisible"><div class="clue-tooltip-arrow"></div><div class="clue-tooltip-text"></div></div>').appendTo('.crossword');
+let correctWordCount = 0;
+var $crosswordPuzzle = $('<div class="mt-4 crossword-puzzle col-md-8 col-lg-10 d-flex justify-content-center align-items-center"></div>');
+var $table = $('<table class="crossword-grid"></table>');
+$crosswordPuzzle.appendTo('.crossword');
+
+for (var i = 0; i < gridSize[1]; i++) {
+    var $row = $('<tr class="grid-row"></tr>');
+    for (var j = 0; j < gridSize[0]; j++) {
+        $('<td class="grid-square"></td>').appendTo($row);
+    }
+    $row.appendTo($table);
+}
+$table.appendTo($crosswordPuzzle);
+
+for (var i = 0; i < words.length; i++) {
+    var word = words[i];
+    var row = word.row;
+    var column = word.column;
+
+    for (var j = 0; j < word.answer.length; j++) {
+        var $square = $('.grid-row').eq(row-1).find('.grid-square').eq(column-1);
+        var title = word.clue + ', letter ' + (j+1) + ' of ' + word.answer.length;
+        var id = (word.direction == 'across' ? 'a' : 'd') + '-' + word.number + '-' + (j+1);
+
+        if (j == 0 && $square.find('.word-label').length == 0) {
+            $('<span class="word-label">' + word.number + '</span>').appendTo($square);
+        }
+
+        var $input = $('<input type="text" class="letter" title="' + title + '" id="' + id + '" maxlength="1" />');
+        $input.attr('data-' + word.direction, word.number);
+        $input.attr('data-' + word.direction + '-clue', word.clue);
+        $input.data('letter', word.answer[j]);
+        $input.appendTo($square);
+        $square.addClass('active');
+
+        if (word.direction == 'down') {
+            row++;
+        } else {
+            column++;
+        }
+    }
+}
+
+var $modal = $('<div class="modal fade " id="success-modal" tabindex="-1" role="dialog"><div class="modal-dialog" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title">Congratulations!</h4></div><div class="modal-body"><p>You have finished the puzzle.</p></div></div></div></div>');
+$modal.appendTo('body');
+
+$('input.letter').on('focus', function() {
+    var $current = $(this);
+    $current.select();
+    $current[0].setSelectionRange(0, 10);
+    getDirection($current);
+    $('[data-' + direction + '=' + $current.data(direction) + ']').parent('.grid-square').addClass('current-word');
+    $('.crossword-clues li').removeClass('active');
+    $('.crossword-clues li[data-direction=' + direction + '][data-clue=' + $(this).data(direction) + ']').addClass('active');
+    $clueTooltip.css({'left': tooltipPosition($current).left + 'px', 'top': tooltipPosition($current).top - 10 + 'px'}).removeClass('invisible').find('.clue-tooltip-arrow').css('left', tooltipPosition($current).offset + 'px');
+});
+$('input.letter').on('blur', function() {
+    $('.grid-square').removeClass('current-word');
+});
+  ////////////////////////////////////////////////////////////////////
   // Tab and Shift/Tab move to next and previous words
   $('input.letter').on('keydown',function(e){
       var $current = $(this);
@@ -158,7 +101,6 @@ var words = [
           checkWord($current);
       };
   })
-  
   // Check if all letters in selected word are correct
   function checkWord($current) {
       var correct;
@@ -169,22 +111,51 @@ var words = [
           $('[data-across='+currentWord+']').each(function(){
               if ($(this).val().toLowerCase() == $(this).data('letter').toLowerCase()) {
                   correct += 1;
+                 
               }
           })
           if (correct == $('[data-across='+currentWord+']').length ) {
               $('[data-across='+currentWord+']').parent('.grid-square').addClass('correct-across');
               $('.crossword-clues li[data-direction=across][data-clue='+currentWord+']').addClass('correct');
+              correctWordCount++; // Increment correct word count
           } else {
               $('[data-across='+currentWord+']').parent('.grid-square').removeClass('correct-across');
               $('.crossword-clues li[data-direction=across][data-clue='+currentWord+']').removeClass('correct');
           }
       }
+    
       
       if ($('.grid-square.active:not([class*=correct])').length == 0 && !successShown) {
           $('#success-modal').modal();
           successShown = true;
+         
       }
+
+      if (correctWordCount == words.length) {
+        const modal = document.getElementById("modal");
+        modal.style.display = "block";
+        modal.classList.add("show-modal");
+      
+        // Create multiple ball elements
+        const numBalls = 20;
+        for (let i = 0; i < numBalls; i++) {
+          const ball = document.createElement("div");
+          ball.classList.add("ball");
+          ball.style.left = `${Math.random() * 100}%`;
+          ball.style.top = `${Math.random() * 10}%`; // Adjust this value for vertical positioning
+          ball.style.animationDelay = `${Math.random() * 2}s`;
+          document.body.appendChild(ball);
+        }
+      
+        // Close modal when the close button is clicked
+        const closeButton = document.querySelector(".close");
+        closeButton.addEventListener("click", function () {
+          modal.style.display = "none";
+        });
+      }
+
   }
+  
   
   // Return the input of the first letter of the next word in the clues list
   function getNextWord($current) {
@@ -255,78 +226,98 @@ var words = [
       left = left - offset;
       return {'left':left,'top':top,'offset':offset};
   }
+  
 
   // Check if all words are correct
 // Check if all words are correct
-function checkAllWords() {
-    var $allWords = $('.crossword-clues li[data-direction]');
-    var correctWords = 0;
+// function checkAllWords() {
+//     var $allWords = $('.crossword-clues li[data-direction]');
+//     var correctWords = 0;
     
-    $allWords.each(function() {
-      var $word = $(this);
-      var direction = $word.data('direction');
-      var currentWord = $word.data('clue');
-      var $wordInputs = $('[data-' + direction + '="' + currentWord + '"]');
-      var isWordCorrect = true;
+//     $allWords.each(function() {
+//       var $word = $(this);
+//       var direction = $word.data('direction');
+//       var currentWord = $word.data('clue');
+//       var $wordInputs = $('[data-' + direction + '="' + currentWord + '"]');
+//       var isWordCorrect = true;
   
-      $wordInputs.each(function() {
-        var $input = $(this);
-        if ($input.val().toLowerCase() !== $input.data('letter').toLowerCase()) {
-          isWordCorrect = false;
-          return false; // Exit the loop if a letter is incorrect
-        }
-      });
+//       $wordInputs.each(function() {
+//         var $input = $(this);
+//         if ($input.val().toLowerCase() !== $input.data('letter').toLowerCase()) {
+//           isWordCorrect = false;
+//           console.log('8ltt');
+//           return false; // Exit the loop if a letter is incorrect
+//         }
+//       });
   
-      if (isWordCorrect) {
-        correctWords++;
-        $word.addClass('correct');
-      } else {
-        $word.removeClass('correct');
-      }
-    });
+//       if (isWordCorrect) {
+//         correctWords++;
+//         $word.addClass('correct');
+//         console.log('s777');
+//       } else {
+//         $word.removeClass('correct');
+//       }
+//     });
+// }
   
-    return correctWords === $allWords.length;
-  }
+//     return correctWords === $allWords.length;
+//   }
   
   // Updated checkWord function
-  function checkWord($current) {
-    var correct;
-    var currentWord;
+//   function checkWord($current) {
+//     var correct;
+//     var currentWord;
   
-    if ($current.is('[data-across]')) {
-      correct = 0;
-      currentWord = $current.data('across');
-      $('[data-across=' + currentWord + ']').each(function() {
-        if ($(this).val().toLowerCase() == $(this).data('letter').toLowerCase()) {
-          correct += 1;
-        }
-      });
+//     if ($current.is('[data-across]')) {
+//       correct = 0;
+//       currentWord = $current.data('across');
+//       $('[data-across=' + currentWord + ']').each(function() {
+//         if ($(this).val().toLowerCase() == $(this).data('letter').toLowerCase()) {
+//           correct += 1;
+//         }
+//       });
   
-      if (correct == $('[data-across=' + currentWord + ']').length) {
-        $('[data-across=' + currentWord + ']').parent('.grid-square').addClass('correct-across');
-        $('.crossword-clues li[data-direction=across][data-clue=' + currentWord + ']').addClass('correct');
-      } else {
-        $('[data-across=' + currentWord + ']').parent('.grid-square').removeClass('correct-across');
-        $('.crossword-clues li[data-direction=across][data-clue=' + currentWord + ']').removeClass('correct');
-      }
-    }
+//       if (correct == $('[data-across=' + currentWord + ']').length) {
+//         $('[data-across=' + currentWord + ']').parent('.grid-square').addClass('correct-across');
+//         $('.crossword-clues li[data-direction=across][data-clue=' + currentWord + ']').addClass('correct');
+//       } else {
+//         $('[data-across=' + currentWord + ']').parent('.grid-square').removeClass('correct-across');
+//         $('.crossword-clues li[data-direction=across][data-clue=' + currentWord + ']').removeClass('correct');
+//       }
+//     }
   
-    var allWordsCorrect = checkAllWords();
+//     var allWordsCorrect = checkAllWords();
   
-    if (allWordsCorrect && !successShown) {
-      // Display congratulations message and animation
-      $('#success-modal').modal();
-      successShown = true;
+//     if (allWordsCorrect && !successShown) {
+//       // Display congratulations message and animation
+//       $('#success-modal').modal();
+//       successShown = true;
       
-      // Add animation class to elements
-      $('.crossword').addClass('animated');
-      $('.crossword-clues').addClass('animated');
-    } else {
-      // Remove animation class from elements
-      $('.crossword').removeClass('animated');
-      $('.crossword-clues').removeClass('animated');
-    }
-  }
+//       // Add animation class to elements
+//       $('.crossword').addClass('animated');
+//       $('.crossword-clues').addClass('animated');
+//     } else {
+//       // Remove animation class from elements
+//       $('.crossword').removeClass('animated');
+//       $('.crossword-clues').removeClass('animated');
+//     }
+//   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   
   
  
