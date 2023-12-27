@@ -72,30 +72,31 @@ $('input.letter').on('blur', function() {
 });
   ////////////////////////////////////////////////////////////////////
   // Tab and Shift/Tab move to next and previous words
- // Keydown event handler
-$input.on('keydown touchstart', function(e) {
-    var $current = $(this);
-    var key = e.key || String.fromCharCode(e.keyCode);
-  
-    if (key === 'Tab') {
-      e.preventDefault();
-      var $next = (e.shiftKey) ? getPrevWord($current) : getNextWord($current);
-      $next.focus();
-    } else if (key === 'Backspace') {
-      if ($current.val().length === 0) {
-        var $prev = getPrevLetter($current);
-        if ($prev) {
-          $prev.focus().val('');
-        }
+  $('input.letter').on('keydown',function(e){
+      var $current = $(this);
+      if (e.which == 9) {       // tab
+          e.preventDefault();
+
+      } else if (e.which == 8) {        // backspace
+          e.preventDefault();
+          if ($(this).val().length > 0) {
+              $(this).val('');
+          } else {
+              if (getPrevLetter($current)) {
+                  getPrevLetter($current).focus().val('');
+              }
+          }
+      } else if ((e.which>=48 && e.which<=90) || (e.which>=96 && e.which<=111) || (e.which>=186 && e.which<=192) || (e.which>=219 && e.which<=222)) {    // typeable characters move to the next square in the word if it exists
+          e.preventDefault();
+          $current.val(String.fromCharCode(e.which));
+          if (getNextLetter($current)) {
+              getNextLetter($current).focus();
+          }
       }
-    } else if (/^[A-Za-z]$/.test(key)) {
-      $current.val(key.toUpperCase());
-      var $next = getNextLetter($current);
-      if ($next) {
-        $next.focus();
-      }
-    }
-  });
+      if (markCorrect) {
+          checkWord($current);
+      };
+  })
   // Check if all letters in selected word are correct
   function checkWord($current) {
       var correct;

@@ -202,6 +202,7 @@ input[id|="a-"].correct {
   background-color: #e8f5e9;
 }
 
+
 /* Add this CSS class for the modal animation */
 .modal {
   overflow-y: scroll;
@@ -296,46 +297,50 @@ input[id|="a-"].correct {
 }
 
 
-
-
-
-
-
-
-
-/* Media Query for screens up to 480px width */
 @media screen and (max-width: 480px) {
-  body {
-    
+  .container-fluid {
+  
+    height: 100vh;
   }
+  .mobile_message{
+    display: block;
+    background-color: #fff;
+    color: red;
+    margin: auto auto;
+    padding: 30px;
+    font-weight: 500;
+    font-size: 24px;
+   
+    
+
+  }
+ 
+
 
   .crossword {
     padding: 10px;
-    margin-top: 100px;
+    height: 100%;
   }
-.main_puzzle{
- 
- 
-}
+  
+
   .crossword-buttons button {
-    min-width: 100px; /* Adjust button size for smaller screens */
-    font-size: 12px; /* Decrease font size for buttons */
+    min-width: 120px;
+    font-size: 14px;
   }
 
   .crossword-clues {
-    font-size: 14px; /* Decrease font size for clues */
+    font-size: 16px;
   }
 
   .grid-square .word-label {
-    font-size: calc(6px + 1vw); /* Adjust label font size for responsiveness */
+    font-size: calc(8px + 1vw);
   }
 
   .grid-square input {
-    font-size: 0.8em; /* Adjust input font size */
+    font-size: 0.8em;
   }
-
-  /* Adjust specific styles as needed for smaller screens */
 }
+
 
 
 
