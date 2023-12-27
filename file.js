@@ -76,11 +76,7 @@ $('input.letter').on('blur', function() {
       var $current = $(this);
       if (e.which == 9) {       // tab
           e.preventDefault();
-          if (e.shiftKey) {       // shift/tab
-              getPrevWord($current).focus();
-          } else {
-              getNextWord($current).focus();
-          }
+
       } else if (e.which == 8) {        // backspace
           e.preventDefault();
           if ($(this).val().length > 0) {
@@ -227,83 +223,6 @@ $('input.letter').on('blur', function() {
       return {'left':left,'top':top,'offset':offset};
   }
   
-
-  // Check if all words are correct
-// Check if all words are correct
-// function checkAllWords() {
-//     var $allWords = $('.crossword-clues li[data-direction]');
-//     var correctWords = 0;
-    
-//     $allWords.each(function() {
-//       var $word = $(this);
-//       var direction = $word.data('direction');
-//       var currentWord = $word.data('clue');
-//       var $wordInputs = $('[data-' + direction + '="' + currentWord + '"]');
-//       var isWordCorrect = true;
-  
-//       $wordInputs.each(function() {
-//         var $input = $(this);
-//         if ($input.val().toLowerCase() !== $input.data('letter').toLowerCase()) {
-//           isWordCorrect = false;
-//           console.log('8ltt');
-//           return false; // Exit the loop if a letter is incorrect
-//         }
-//       });
-  
-//       if (isWordCorrect) {
-//         correctWords++;
-//         $word.addClass('correct');
-//         console.log('s777');
-//       } else {
-//         $word.removeClass('correct');
-//       }
-//     });
-// }
-  
-//     return correctWords === $allWords.length;
-//   }
-  
-  // Updated checkWord function
-//   function checkWord($current) {
-//     var correct;
-//     var currentWord;
-  
-//     if ($current.is('[data-across]')) {
-//       correct = 0;
-//       currentWord = $current.data('across');
-//       $('[data-across=' + currentWord + ']').each(function() {
-//         if ($(this).val().toLowerCase() == $(this).data('letter').toLowerCase()) {
-//           correct += 1;
-//         }
-//       });
-  
-//       if (correct == $('[data-across=' + currentWord + ']').length) {
-//         $('[data-across=' + currentWord + ']').parent('.grid-square').addClass('correct-across');
-//         $('.crossword-clues li[data-direction=across][data-clue=' + currentWord + ']').addClass('correct');
-//       } else {
-//         $('[data-across=' + currentWord + ']').parent('.grid-square').removeClass('correct-across');
-//         $('.crossword-clues li[data-direction=across][data-clue=' + currentWord + ']').removeClass('correct');
-//       }
-//     }
-  
-//     var allWordsCorrect = checkAllWords();
-  
-//     if (allWordsCorrect && !successShown) {
-//       // Display congratulations message and animation
-//       $('#success-modal').modal();
-//       successShown = true;
-      
-//       // Add animation class to elements
-//       $('.crossword').addClass('animated');
-//       $('.crossword-clues').addClass('animated');
-//     } else {
-//       // Remove animation class from elements
-//       $('.crossword').removeClass('animated');
-//       $('.crossword-clues').removeClass('animated');
-//     }
-//   }
-
-
 
 
 
