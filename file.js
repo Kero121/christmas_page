@@ -72,31 +72,21 @@ $('input.letter').on('blur', function() {
 });
   ////////////////////////////////////////////////////////////////////
   // Tab and Shift/Tab move to next and previous words
-  $('input.letter').on('keydown',function(e){
-      var $current = $(this);
-      if (e.which == 9) {       // tab
-          e.preventDefault();
-
-      } else if (e.which == 8) {        // backspace
-          e.preventDefault();
-          if ($(this).val().length > 0) {
-              $(this).val('');
-          } else {
-              if (getPrevLetter($current)) {
-                  getPrevLetter($current).focus().val('');
-              }
-          }
-      } else if ((e.which>=48 && e.which<=90) || (e.which>=96 && e.which<=111) || (e.which>=186 && e.which<=192) || (e.which>=219 && e.which<=222)) {    // typeable characters move to the next square in the word if it exists
-          e.preventDefault();
-          $current.val(String.fromCharCode(e.which));
-          if (getNextLetter($current)) {
-              getNextLetter($current).focus();
-          }
+  $('input.letter').on('input', function(e) {
+    var $current = $(this);
+    if ($(this).val().length > 0) {
+      if (getNextLetter($current)) {
+        getNextLetter($current).focus();
       }
-      if (markCorrect) {
-          checkWord($current);
-      };
-  })
+    } else {
+      if (getPrevLetter($current)) {
+        getPrevLetter($current).focus();
+      }
+    }
+    if (markCorrect) {
+      checkWord($current);
+    }
+  });
   // Check if all letters in selected word are correct
   function checkWord($current) {
       var correct;
@@ -202,13 +192,13 @@ $('input.letter').on('blur', function() {
   
   // Return the input of the next letter in the current word if it exists, otherwise return false
   function getNextLetter($current) {
-      var length = $('[data-'+direction+'='+$current.data(direction)+']').length;
-      var index = $('[data-'+direction+'='+$current.data(direction)+']').index($current);
-      if (index < length-1) {
-         return $('[data-'+direction+'='+$current.data(direction)+']').eq(index+1);
-      } else {
-         return false;
-      }
+    var length = $('[data-'+direction+'='+$current.data(direction)+']').length;
+    var index = $('[data-'+direction+'='+$current.data(direction)+']').index($current);
+    if (index < length-1) {
+      return $('[data-'+direction+'='+$current.data(direction)+']').eq(index+1);
+    } else {
+      return false;
+    }
   }
   
   // Return the top, left, and offset positions for tooltip placement
